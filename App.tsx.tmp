@@ -1,0 +1,182 @@
+import {
+	DefaultMainMenu,
+	DefaultMainMenuContent,
+	TLComponents,
+	Tldraw,
+	TldrawUiMenuGroup,
+	TldrawUiMenuItem,
+	getSnapshot,
+	loadSnapshot,
+	useEditor,
+	DefaultColorThemePalette,
+	DefaultKeyboardShortcutsDialog,
+	DefaultKeyboardShortcutsDialogContent,
+	DefaultToolbar,
+	DefaultToolbarContent,
+	TLUiAssetUrlOverrides,
+	TLUiOverrides,
+	useIsToolSelected,
+	useTools,
+} from 'tldraw'
+import './index.css'
+
+import { {% for icon in icons %}IconsTool{{ icon[:-4] }}, {% endfor %} } from './icons-tool-util'
+
+// Ui add open and save file
+
+DefaultColorThemePalette.lightMode.background = 'white'
+
+var namef = "sample.tldr"
+
+function CustomMainMenu() {
+    const editor = useEditor()
+	return (
+		<DefaultMainMenu>
+			<div>
+				<TldrawUiMenuGroup id="addon">
+					<TldrawUiMenuItem
+						id="new"
+						label="New"
+						icon="external-link"
+						readonlyOk
+						onSelect={() => {
+                            editor.getPages().forEach(function (page) {
+                              editor.deletePage(page)
+                            });
+                            editor.deleteShapes(editor.getCurrentPageShapes())
+                            editor.renamePage(editor.getCurrentPage().id, "Page 1")
+                            namef = "sample.tldr";
+                            window.parent.document.title =  "Tldraw";
+						}}
+					/>
+					<TldrawUiMenuItem
+						id="open"
+						label="Open"
+						icon="external-link"
+						readonlyOk
+						onSelect={() => {
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.onchange = function(event) {
+                                try {
+                                    let files = input.files;
+                                    if (files !== null) {
+                                        if ( files.length > 0) {
+                                            let file = files[0];
+                                            namef = file.name;
+                                            window.parent.document.title =  namef.split('.')[0];
+                                            if (file !== null) {
+                                                let reader = new FileReader();
+                                                const self = this;
+                                                reader.onload = (event) => {
+                                                    if (event.target !== null) {
+                                                        var result = event.target.result as string;
+                                                        if (result !== null) {
+                                                            loadSnapshot(editor.store, JSON.parse(result));
+                                                        };
+                                                    }
+                                                };
+                                                reader.readAsText(file);
+                                            }
+                                        }
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                            };
+                            input.click();							
+						}}
+					/>
+					<TldrawUiMenuItem
+						id="save"
+						label="Save"
+						icon="external-link"
+						readonlyOk
+						onSelect={() => {
+							const link = document.createElement("a");
+                            const file = new Blob([JSON.stringify(getSnapshot(editor.store))], { type: 'text/plain' });
+                            link.href = URL.createObjectURL(file);
+                            link.download = namef;
+                            link.click();
+                            URL.revokeObjectURL(link.href);
+						}}
+					/>
+				</TldrawUiMenuGroup>
+			</div>
+			<DefaultMainMenuContent />
+		</DefaultMainMenu>
+	)
+}
+
+
+const components: TLComponents = {
+	Toolbar: (props) => {
+		const tools = useTools()
+		return (
+			<DefaultToolbar {...props}>
+				<DefaultToolbarContent />
+				{% for icon in icons %}<TldrawUiMenuItem {...tools['{{ icon[:-4] }}']} />
+				{% endfor %}
+			</DefaultToolbar>
+		)
+	},
+	KeyboardShortcutsDialog: (props) => {
+		const tools = useTools()
+		return (
+			<DefaultKeyboardShortcutsDialog {...props}>
+				<DefaultKeyboardShortcutsDialogContent />
+			</DefaultKeyboardShortcutsDialog>
+		)
+	},
+	MainMenu: CustomMainMenu,
+	DebugPanel: null,
+	DebugMenu: null,
+}
+
+
+const uiOverrides: TLUiOverrides = {
+	tools(editor, tools) {
+		// Create a tool item in the ui's context.
+		{% for icon in icons %}tools.{{ icon[:-4] }} = {
+			id: '{{ icon[:-4] }}',
+			icon: '{{ icon[:-4] }}',
+			label: '{{ icon[:-4] }}',
+			onSelect: () => {
+				editor.setCurrentTool('{{ icon[:-4] }}');
+			},
+		}
+		{% endfor %}
+		return tools
+	},
+}
+
+export const customAssetUrls: TLUiAssetUrlOverrides = {
+	icons: {
+	{% for icon in icons %}'{{ icon[:-4] }}': '/{{ icon }}',		
+    {% endfor %}
+	},
+}
+
+const customTools = [{% for icon in icons %}IconsTool{{ icon[:-4] }}, {% endfor %}]
+
+
+
+
+{% raw %}
+export default function App() {
+	return (
+		<div style={{ position: 'fixed', inset: 0 }}>
+			<Tldraw
+				// Pass in the array of custom tool classes
+				tools={customTools}
+				// Pass in our ui overrides
+				overrides={uiOverrides}
+				// pass in our custom components
+				components={components}
+				// pass in our custom asset urls
+				assetUrls={customAssetUrls}
+			/>
+		</div>
+	)
+}
+{% endraw %}

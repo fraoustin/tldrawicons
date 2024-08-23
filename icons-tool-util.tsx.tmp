@@ -1,0 +1,56 @@
+import {
+    StateNode,
+    AssetRecordType,
+} from 'tldraw'
+
+// Check out the custom tool example for a more detailed explanation of the tool class.
+
+const OFFSET = 12
+export class IconsToolGeneric extends StateNode {
+	static override id = 'generic'
+
+	override onEnter = () => {
+		this.editor.setCursor({ type: 'cross', rotation: 0 })
+	}
+
+	override onPointerDown = () => {
+		const { currentPagePoint } = this.editor.inputs
+		const assetId = AssetRecordType.createId()
+		const imageWidth = 24
+		const imageHeight = 24
+		this.editor.createAssets([
+			{
+				id: assetId,
+				type: 'image',
+				typeName: 'asset',
+				props: {
+					name: this.id + '.svg',
+					src: '/' + this.id + '.svg',
+					w: imageWidth,
+					h: imageHeight,
+					mimeType: 'image/svg',
+					isAnimated: false,
+				},
+				meta: {},
+			},
+		])
+		this.editor.createShape({
+			type: 'image',
+			x: currentPagePoint.x - OFFSET,
+			y: currentPagePoint.y - OFFSET,
+			props: {
+				assetId,
+				w: imageWidth *2,
+				h: imageHeight *2,
+			},
+		})
+		this.editor.setCurrentTool('select');
+		
+	}
+}
+
+{% for icon in icons %}
+export class IconsTool{{ icon[:-4] }} extends IconsToolGeneric {
+	static override id = '{{ icon[:-4] }}'
+}
+{% endfor %}
