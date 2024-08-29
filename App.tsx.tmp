@@ -152,7 +152,7 @@ const uiOverrides: TLUiOverrides = {
 
 export const customAssetUrls: TLUiAssetUrlOverrides = {
 	icons: {
-	{% for icon in icons %}'{{ icon[:-4] }}': '/{{ icon }}',		
+	{% for icon in icons %}'{{ icon[:-4] }}': 'icons/{{ icon }}',		
     {% endfor %}
 	},
 }

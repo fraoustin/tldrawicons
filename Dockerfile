@@ -20,7 +20,8 @@ COPY --from=builder /builder/icons-tool-util.tsx /test/src/icons-tool-util.tsx
 COPY index.css /test/src/index.css
 COPY index.html /test/index.html
 COPY favicon.svg /test/favicon.svg
-COPY icons/*.svg /test/
+RUN mkdir icons
+COPY --from=builder /builder/icons/*.svg /test/icons/
 RUN npm install
 RUN npm install tldraw
 

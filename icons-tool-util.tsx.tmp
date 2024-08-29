@@ -1,12 +1,16 @@
+import React, { Component } from 'react';
 import {
     StateNode,
     AssetRecordType,
+    DefaultColorStyle,
+    DefaultSizeStyle,
+    HighlightShapeTool
 } from 'tldraw'
 
 // Check out the custom tool example for a more detailed explanation of the tool class.
 
 const OFFSET = 12
-export class IconsToolGeneric extends StateNode {
+export class IconsToolGeneric extends HighlightShapeTool {
 	static override id = 'generic'
 
 	override onEnter = () => {
@@ -15,9 +19,31 @@ export class IconsToolGeneric extends StateNode {
 
 	override onPointerDown = () => {
 		const { currentPagePoint } = this.editor.inputs
+		const color = this.editor.getSharedStyles().get(DefaultColorStyle).value
+		const size = this.editor.getSharedStyles().get(DefaultSizeStyle).value
+		console.log(size)
 		const assetId = AssetRecordType.createId()
-		const imageWidth = 24
-		const imageHeight = 24
+		
+		var imageWidth = 24
+		var imageHeight = 24
+		
+		if (size == 's') {
+            imageWidth = 18
+            imageHeight = 18
+		}
+		if (size == 'm') {
+            imageWidth = 24
+            imageHeight = 24
+		}
+		if (size == 'l') {
+            imageWidth = 36
+            imageHeight = 36
+		}
+		if (size == 'xl') {
+            imageWidth = 44
+            imageHeight = 44
+		}
+		
 		this.editor.createAssets([
 			{
 				id: assetId,
@@ -25,7 +51,7 @@ export class IconsToolGeneric extends StateNode {
 				typeName: 'asset',
 				props: {
 					name: this.id + '.svg',
-					src: '/' + this.id + '.svg',
+					src: '/icons/' + this.id + '-' + color +'.svg',
 					w: imageWidth,
 					h: imageHeight,
 					mimeType: 'image/svg',
