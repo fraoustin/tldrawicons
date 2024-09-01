@@ -6,7 +6,7 @@ RUN mkdir icons
 COPY builder.py .
 COPY App.tsx.tmp .
 COPY icons-tool-util.tsx.tmp .
-COPY icons/*.svg icons
+COPY icons/*.svg icons/
 RUN pip install jinja2
 RUN python builder.py
 

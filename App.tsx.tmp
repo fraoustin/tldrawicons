@@ -24,7 +24,7 @@ import { {% for icon in icons %}IconsTool{{ icon[:-4] }}, {% endfor %} } from '.
 
 // Ui add open and save file
 
-DefaultColorThemePalette.lightMode.background = 'white'
+DefaultColorThemePalette.lightMode.background = '#FFFFFF'
 
 var namef = "sample.tldr"
 
