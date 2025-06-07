@@ -1,7 +1,6 @@
 import {
 	DefaultMainMenu,
 	DefaultMainMenuContent,
-	TLComponents,
 	Tldraw,
 	TldrawUiMenuGroup,
 	TldrawUiMenuItem,
@@ -13,11 +12,14 @@ import {
 	DefaultKeyboardShortcutsDialogContent,
 	DefaultToolbar,
 	DefaultToolbarContent,
-	TLUiAssetUrlOverrides,
-	TLUiOverrides,
 	useIsToolSelected,
 	useTools,
 } from 'tldraw'
+
+type TLComponents = Parameters<typeof Tldraw>[0]['components']
+type TLUiAssetUrlOverrides = Parameters<typeof Tldraw>[0]['assetUrls']
+type TLUiOverrides = Parameters<typeof Tldraw>[0]['overrides']
+
 import './index.css'
 
 import { {% for icon in icons %}IconsTool{{ icon[:-4] }}, {% endfor %} } from './icons-tool-util'

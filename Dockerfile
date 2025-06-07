@@ -24,6 +24,7 @@ RUN mkdir icons
 COPY --from=builder /builder/icons/*.svg /test/icons/
 RUN npm install
 RUN npm install tldraw
+COPY vite.config.js /test/vite.config.js
 
 ENV SHELL /bin/sh
 ENV HOST 0.0.0.0
